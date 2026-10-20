@@ -31,22 +31,78 @@ source script/alias.sh && bk178 # pakai alias
 2. **Rotasi arsip**: hanya 5 arsip terbaru disimpan; jalankan backup lebih dari 5 kali lalu cek `ls ~/backup_09011382530178`.
 
 ## Bukti job control
-Tempel keluaran terminal ASLI Anda di sini (teks, bukan gambar):
 
 ```
-$ ./script/backup_loop.sh &
-(tempel)
+$ INTERVAL=10 ./backup_loop.sh > /dev/null &
+[1] 5298
 $ jobs -l
-(tempel)
+[1]+  5298 Running                 INTERVAL=10 ./backup_loop.sh > /dev/null &
 $ fg
-(tempel, lalu tekan Ctrl+Z)
+INTERVAL=10 ./backup_loop.sh > /dev/null
+^Z
+[1]+  Stopped                 INTERVAL=10 ./backup_loop.sh > /dev/null
 $ bg
-(tempel)
-$ ps x
-(tempel)
+[1]+ INTERVAL=10 ./backup_loop.sh > /dev/null &
+$ ps x | grep backup_loop
+ 5298 pts/0    S      0:00 /bin/bash ./backup_loop.sh
+ 5425 pts/0    S+     0:00 grep --color=auto backup_loop
+$ sleep 25
+$ ls ~/backup_09011382530178
+backup_09011382530178_20261020_134135.tar.gz
+backup_09011382530178_20261020_134145.tar.gz
+backup_09011382530178_20261020_134155.tar.gz
+backup_09011382530178_20261020_134205.tar.gz
+backup_09011382530178_20261020_134215.tar.gz
+backup.log
+daftar_file.txt
 $ kill %1
-(tempel)
+$ jobs -l
+[1]+  5298 Terminated              INTERVAL=10 ./backup_loop.sh > /dev/null
 ```
+
+Keterangan: loop berjalan di background (`&`), dipindah ke foreground (`fg`), dihentikan sementara (Ctrl+Z), dilanjutkan di background (`bg`), lalu dihentikan (`kill %1`). Arsip terbentuk tiap 10 detik dan rotasi menyisakan 5 arsip terbaru.
 
 ## Kendala
-- (Tulis error yang Anda alami dan cara mengatasinya.)
+
+- Salah mengetik `github,com` dengan koma sehingga `git clone` gagal; diperbaiki dengan `github.com`.
+- Pesan commit tidak ditutup tanda kutip sehingga terminal menunggu input; diperbaiki dengan Ctrl+C lalu mengetik ulang.
+- `timedatectl` tidak ada di Ubuntu 18.04; waktu sudah benar dari perintah `date`.
+- Nama repositori sempat berhuruf kapital; diubah menjadi huruf kecil lewat Settings GitHub.
+## Bukti job control
+
+```
+$ INTERVAL=10 ./backup_loop.sh > /dev/null &
+[1] 5298
+$ jobs -l
+[1]+  5298 Running                 INTERVAL=10 ./backup_loop.sh > /dev/null &
+$ fg
+INTERVAL=10 ./backup_loop.sh > /dev/null
+^Z
+[1]+  Stopped                 INTERVAL=10 ./backup_loop.sh > /dev/null
+$ bg
+[1]+ INTERVAL=10 ./backup_loop.sh > /dev/null &
+$ ps x | grep backup_loop
+ 5298 pts/0    S      0:00 /bin/bash ./backup_loop.sh
+ 5425 pts/0    S+     0:00 grep --color=auto backup_loop
+$ sleep 25
+$ ls ~/backup_09011382530178
+backup_09011382530178_20261020_134135.tar.gz
+backup_09011382530178_20261020_134145.tar.gz
+backup_09011382530178_20261020_134155.tar.gz
+backup_09011382530178_20261020_134205.tar.gz
+backup_09011382530178_20261020_134215.tar.gz
+backup.log
+daftar_file.txt
+$ kill %1
+$ jobs -l
+[1]+  5298 Terminated              INTERVAL=10 ./backup_loop.sh > /dev/null
+```
+
+Keterangan: loop berjalan di background (`&`), dipindah ke foreground (`fg`), dihentikan sementara (Ctrl+Z), dilanjutkan di background (`bg`), lalu dihentikan (`kill %1`). Arsip terbentuk tiap 10 detik dan rotasi menyisakan 5 arsip terbaru.
+
+## Kendala
+
+- Salah mengetik `github,com` dengan koma sehingga `git clone` gagal; diperbaiki dengan `github.com`.
+- Pesan commit tidak ditutup tanda kutip sehingga terminal menunggu input; diperbaiki dengan Ctrl+C lalu mengetik ulang.
+- `timedatectl` tidak ada di Ubuntu 18.04; waktu sudah benar dari perintah `date`.
+- Nama repositori sempat berhuruf kapital; diubah menjadi huruf kecil lewat Settings GitHub.
